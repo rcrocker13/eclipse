@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+	<script src="https://unpkg.com/d3"></script>
+  <script src="https://unpkg.com/topojson"></script>
+  <script src="https://unpkg.com/versor"></script>
+  <script src="https://unpkg.com/d3-inertia"></script>
+	<style>
+  	.eclipses path {
+	    fill: #666;
+	    fill-opacity: 0.6;
+	  }
+    svg {
+      cursor: move; /* fallback if grab cursor is unsupported */
+      cursor: grab;
+      cursor: -moz-grab;
+      cursor: -webkit-grab;
+    }
+    svg.dragging {
+      cursor: grabbing;
+      cursor: -moz-grabbing;
+      cursor: -webkit-grabbing;
+    }
+    #sphere {
+      fill: #eff;
+    }
+	</style>
+</head>
+<body>
+  <svg></svg>
+  <script>
+const width = Math.min(960,window.innerWidth), height = Math.min(800,window.innerHeight), margin = 5;
+const svg = d3.select("svg").attr('width', width).attr('height', height);
+
+svg.append('path').attr('id', 'sphere').datum({type:"Sphere"});
+const path = svg.append("path");
+const eclipsesg = svg.append("g").classed("eclipses", true);
+const projection = d3
+  .geoOrthographic()
+  .rotate([-80,-35])
+  .fitExtent([[margin, margin], [width-margin, height-margin]], { type: "Sphere" });
+const geoPath = d3.geoPath().projection(projection);
+
+const color = d3.scaleOrdinal(d3.schemeCategory20);
+
+function draw() {
+  svg.selectAll("path").attr("d", geoPath);
+}
+
+d3
+  .queue()
+  .defer(d3.json, "https://unpkg.com/world-atlas/world/110m.json")
+  .defer(d3.json, "eclipses.json")
+  .await(function(error, file1, file2) {
+    createGlobe(file1, file2);
+  });
+
+function createGlobe(world, eclipses) {
+
+  path.datum(topojson.feature(world, world.objects.land));
+
+  eclipsesg
+    .selectAll("path")
+    .data(eclipses.features)
+    .enter()
+    .append("path")
+    .style("fill", (d, i) => color(i));
+
+  draw();
+
+  var inertia = d3.geoInertiaDrag(svg, draw);
+  d3.timer(function(e){
+    if (inertia.timer) return;
+    var rotate = projection.rotate();
+    projection.rotate([rotate[0] - 0.1, rotate[1], rotate[2]]);
+    draw();
+  })
+}
+  </script>
+</body>
+</html>
