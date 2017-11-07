@@ -22,23 +22,32 @@
       cursor: -webkit-grabbing;
     }
     #sphere {
-      fill: #eff;
+      fill: #EEE;
     }
 	</style>
 </head>
 <body>
-  <svg></svg>
+  <svg style="width:400px;height:400px;"></svg>
   <script>
-const width = Math.min(960,window.innerWidth), height = Math.min(800,window.innerHeight), margin = 5;
-const svg = d3.select("svg").attr('width', width).attr('height', height);
+const svg = d3
+  .select("svg");
 
-svg.append('path').attr('id', 'sphere').datum({type:"Sphere"});
-const path = svg.append("path");
-const eclipsesg = svg.append("g").classed("eclipses", true);
+svg
+  .append('path')
+  .attr('id', 'sphere')
+  .datum({type:"Sphere"});
+
+const path = svg
+  .append("path");
+const eclipsesg = svg
+  .append("g")
+  .classed("eclipses", true);
 const projection = d3
   .geoOrthographic()
-  .rotate([-80,-35])
-  .fitExtent([[margin, margin], [width-margin, height-margin]], { type: "Sphere" });
+  .scale(200)
+  .translate([200,200])
+  .center([0,0])
+  .rotate([230,0]);
 const geoPath = d3.geoPath().projection(projection);
 
 const color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -64,7 +73,7 @@ function createGlobe(world, eclipses) {
     .data(eclipses.features)
     .enter()
     .append("path")
-    .style("fill", (d, i) => color(i));
+    .style("fill", "#CCCCCC");
 
   draw();
 
