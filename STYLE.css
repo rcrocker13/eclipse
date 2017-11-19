@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+}
+path {
+  fill: #EC665B;
+  fill-opacity: 1;
+}
+#sphere {
+  fill: #76B5EE;
+}
+svg {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+svg.dragging {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
